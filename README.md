@@ -1,4 +1,56 @@
 
+![Screenshot (7)](https://github.com/Riteshshinde2/HR-DASHBOARD/assets/155972900/2086dff8-29d9-47d8-9641-101a6db94745)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # HR-DASHBOARD
