@@ -1,10 +1,14 @@
+
+
+
 # HR-DASHBOARD
 Data Used
-Data - HR Data with over 22000 rows from the year 2000 to 2020.
 
-Data Cleaning & Analysis - MySQL Workbench
+#Data - HR Data with over 22000 rows from the year 2000 to 2020.
 
-Data Visualization - PowerBI.
+#Data Cleaning & Analysis - SQL
+
+#Data Visualization - PowerBI.
 
 Questions
 1)What is the gender breakdown of employees in the company?
