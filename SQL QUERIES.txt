@@ -1,0 +1,184 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+---DATA CLEANING----------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ALTER TABLE [dbo].[HumanResources]
+add  emp_id nvarchar(20)
+
+update HumanResources
+set[emp_id] =[id]
+
+ALTER TABLE [dbo].[HumanResources]
+drop column id
+
+SELECT [emp_id], [first_name]
+      ,[last_name],[birthdate],[gender],[race],[department] ,[jobtitle] ,[location],[hire_date],[termdate],[location_city]
+      ,[location_state]
+  FROM [HR].[dbo].[HumanResources]
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+select [birthdate]
+from HumanResources
+
+
+UPDATE HumanResources
+SET birthdate = 
+    CASE 
+        WHEN birthdate LIKE '%/%' THEN 
+            CONCAT(SUBSTRING(birthdate, 7, 4), '-', SUBSTRING(birthdate, 1, 2), '-', SUBSTRING(birthdate, 4, 2))
+        WHEN birthdate LIKE '%-%' THEN 
+            CONCAT(SUBSTRING(birthdate, 6, 4), '-', SUBSTRING(birthdate, 1, 2), '-', SUBSTRING(birthdate, 4, 2))
+        ELSE birthdate
+    END;
+
+alter table humanresources
+alter column birthdate date
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+UPDATE HumanResources
+SET termdate = '0000-00-00'
+WHERE termdate IS NULL;
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+alter table [dbo].[HumanResources]
+add  age int
+
+UPDATE HumanResources
+SET age = DATEDIFF(YEAR, birthdate, GETDATE());
+
+select min(age) as youngest,
+max(age) as eldest
+from HumanResources
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+---DATA ANALYSIS-----------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--gender breakdown of employees in the company
+
+select gender ,count(emp_id) No_Of_Employees
+from [dbo].[HumanResources]
+where age>=18
+group by gender
+order by   count(emp_id) desc;
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--employees according to ethnicity
+
+select race , count(emp_id) No_Of_Employees
+from [dbo].[HumanResources]
+group by race
+order by   count(emp_id) desc;
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--no of employees according to age groups
+
+select min(age) as youngest,
+max(age) as eldest
+from HumanResources
+
+ALTER TABLE [dbo].[HumanResources]
+add age_group nvarchar(120)
+ 
+UPDATE HumanResources
+SET age_group = 
+    CASE 
+        WHEN age >= 18 AND age <= 24 THEN '18-24'
+        WHEN age >= 25 AND age <= 30 THEN '25-30'
+        WHEN age >= 31 AND age <= 36 THEN '31-36'
+        WHEN age >= 37 AND age <= 42 THEN '37-42'
+        WHEN age >= 43 AND age <= 48 THEN '43-48'
+        WHEN age >= 49 AND age <= 54 THEN '49-54'
+        WHEN age >= 55 AND age <= 60 THEN '55-60'
+        ELSE ''
+    END;
+
+select   
+ age_group,count([emp_id]) as NoOfEmployees
+from HumanResources
+group by age_group
+order by age_group
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--no of employees according to age groupsand gender
+
+select   
+age_group,count([emp_id]) as NoOfEmployees, gender as gender
+from HumanResources
+group by age_group,gender
+order by age_group,gender
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--working location
+select 
+location,count(*)as NoOfEmployees
+from HumanResources
+group by location
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--working location according to age group
+select 
+location,age_group,count(*)as NoOfEmployees
+from HumanResources
+group by location,age_group
+order by age_group,location
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--working location according to age group and gender
+select 
+location,gender ,age_group,count(*)as NoOfEmployees
+from HumanResources
+group by age_group,gender,location
+order by age_group,gender,location
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--gender differentiation accross various department
+select department , gender , count(*) as NoOfEmployees
+from HumanResources
+group by department, gender
+order by department, gender
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--location of employees accross cities
+
+select 
+[location_city],
+count(*) as employee_number
+from [dbo].[HumanResources]
+group by location_city
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--location of employees accross  state
+select 
+[location_state],
+count(*) as employee_number
+from [dbo].[HumanResources]
+group by location_state
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--location of employees accross cities and state
+select 
+[location_state],
+[location_city],
+count(*) as employee_number
+from [dbo].[HumanResources]
+group by [location_state],location_city
+order by location_state
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--NO of employees according to age_groups accross dept
+
+select [department],count(*) as Employee_Number,
+[age_group]
+from [dbo].[HumanResources]
+group by department,age_group
+order by department
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+select [department],count(*) as Employee_Number,
+avg(age) as avg_age
+from [dbo].[HumanResources]
+group by department
+order by department
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--termination percentage per department
+
+SELECT [department],
+       COUNT(*) AS total_Count,
+       SUM(CASE WHEN TRY_CONVERT(DATE, term_data, 120)
+	   IS NOT NULL AND TRY_CONVERT(DATE, term_data, 120) <= GETDATE() 
+	   THEN 1 ELSE 0 END) AS termination_count,
+       CAST(SUM(CASE WHEN TRY_CONVERT(DATE, term_data, 120)
+	   IS NOT NULL AND TRY_CONVERT(DATE, term_data, 120) <= GETDATE()
+	   THEN 1 ELSE 0 END) AS DECIMAL) / COUNT(*) AS termination_rate
+FROM [dbo].[HumanResources]
+GROUP BY [department];
