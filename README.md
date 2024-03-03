@@ -90,7 +90,7 @@ White race is the most dominant while Native Hawaiian and American Indian are th
 
 The youngest employee is 22 years old and the oldest is 59 years old
 
-5 age groups were created 
+7 age groups were created 
 18-24,
 25-30,
 31-36,
